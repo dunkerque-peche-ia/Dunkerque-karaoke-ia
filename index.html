@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaraoKé IA Dunkerque - Trouvez vos soirées karaoké à Bray-Dunes & Gravelines</title>
+  <meta name="description" content="Trouvez facilement toutes les soirées karaoké à Bray-Dunes, Gravelines et Dunkerque grâce à notre assistant IA intelligent et notre carte interactive.">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Custom Neon Styles for Map Markers -->
+  <style>
+    .map-neon-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+      animation: pulse-dot 1.5s infinite alternate;
+    }
+    .neon-marker-pink {
+      background-color: var(--neon-pink);
+      box-shadow: 0 0 12px var(--neon-pink);
+    }
+    .neon-marker-cyan {
+      background-color: var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan);
+    }
+    .neon-marker-purple {
+      background-color: var(--neon-purple);
+      box-shadow: 0 0 12px var(--neon-purple);
+    }
+    @keyframes pulse-dot {
+      from { transform: scale(0.9); opacity: 0.8; }
+      to { transform: scale(1.15); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <header>
+    <div style="display: flex; flex-direction: column; gap: 0.15rem;">
+      <div class="logo">
+        <i class="fas fa-microphone-alt logo-icon"></i>
+        <h1>KaraoKé<span> IA Dunkerque</span></h1>
+      </div>
+      <span style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 2.75rem; font-weight: 500;">
+        Création de <strong style="color: var(--neon-cyan);">Dunkirk Informatique</strong> — 📞 07 83 14 17 40
+      </span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-primary" id="add-event-btn" title="Ajouter une soirée karaoké">
+        <i class="fas fa-plus"></i> Ajouter une soirée
+      </button>
+      <button class="btn-icon" id="settings-btn" title="Configurer l'IA">
+        <i class="fas fa-cog"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- App Body Layout -->
+  <main class="app-container">
+    
+    <!-- AI Chatbot Column -->
+    <section class="glass-panel chat-panel" aria-label="Assistant de recherche IA">
+      <div class="chat-header">
+        <i class="fas fa-robot" style="color: var(--neon-cyan); font-size: 1.25rem;"></i>
+        <h2>Assistant IA Karaoké</h2>
+        <span class="chat-status" id="chat-status-dot" title="IA Locale active"></span>
+      </div>
+      
+      <div class="chat-messages" id="chat-messages">
+        <!-- Messages will be populated by JS -->
+      </div>
+      
+      <div class="chat-input-area">
+        <form class="chat-form" id="chat-form">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Où chanter ce soir ? Posez votre question..." required autocomplete="off">
+          <button type="submit" class="btn-send" id="btn-chat-send" aria-label="Envoyer le message">
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Dashboard/Events Column -->
+    <section class="dashboard-panel" aria-label="Tableau de bord des soirées">
+      
+      <!-- Left side: List and Filters -->
+      <div class="events-list-container">
+        <!-- Interactive Filters -->
+        <div class="glass-panel filters-container">
+          <div>
+            <div class="filter-title">Ville</div>
+            <div class="filter-row">
+              <button class="filter-chip active" data-filter-city="all">Toutes les villes</button>
+              <button class="filter-chip" data-filter-city="bray-dunes">Bray-Dunes</button>
+              <button class="filter-chip" data-filter-city="gravelines">Gravelines</button>
+              <button class="filter-chip" data-filter-city="dunkerque">Dunkerque & Alentours</button>
+            </div>
+          </div>
+          <div>
+            <div class="filter-title">Date (Aujourd'hui: Ven 24 Juil 2026)</div>
+            <div class="filter-row">
+              <button class="filter-chip active" data-filter-date="all">Toutes les dates</button>
+              <button class="filter-chip" data-filter-date="today">Ce soir</button>
+              <button class="filter-chip" data-filter-date="weekend">Ce week-end</button>
+              <button class="filter-chip" data-filter-date="summer">Été 2026</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Listing -->
+        <div class="events-section-header">
+          <h2>Soirées Karaoké à l'affiche</h2>
+          <span class="events-count" id="events-count">0 soirée</span>
+        </div>
+
+        <div class="events-grid" id="events-grid">
+          <!-- Event cards will be dynamically rendered here -->
+        </div>
+      </div>
+
+      <!-- Right side: Sticky Map -->
+      <div class="map-side-panel">
+        <div class="map-container">
+          <div id="map"></div>
+        </div>
+      </div>
+      
+    </section>
+
+  </main>
+
+  <!-- Settings / Gemini Key Modal -->
+  <div class="modal" id="settings-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-brain" style="color: var(--neon-cyan);"></i> Configuration de l'IA</h3>
+        <button class="btn-close" id="close-settings" aria-label="Fermer"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 1.25rem; font-size: 0.9rem; color: var(--text-secondary);">
+          Par défaut, l'application utilise une IA locale simulée qui répond sur la base des mots-clés. 
+          Pour activer une <strong>véritable intelligence artificielle conversationnelle (Google Gemini 1.5 Flash)</strong>, insérez votre clé API ci-dessous.
+        </p>
+        <div class="form-group">
+          <label for="api-key-input">Clé API Google Gemini</label>
+          <input type="password" id="api-key-input" class="form-control" placeholder="AIzaSy...">
+        </div>
+        <p style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3;">
+          ⚠️ Votre clé API est conservée uniquement en local dans le stockage de votre navigateur (localStorage). Elle n'est transmise à aucun serveur tiers en dehors des requêtes directes à l'API Google.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" id="save-settings">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Custom Event Modal -->
+  <div class="modal" id="event-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-music" style="color: var(--neon-pink);"></i> Ajouter une soirée karaoké</h3>
+        <button class="btn-close" id="close-event" aria-label="Fermer"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="event-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="event-title-input">Titre de la soirée</label>
+            <input type="text" id="event-title-input" class="form-control" placeholder="ex: Méga Karaoké des Années 90" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="event-city-select">Ville</label>
+              <select id="event-city-select" class="form-control" required>
+                <option value="bray-dunes">Bray-Dunes</option>
+                <option value="gravelines">Gravelines</option>
+                <option value="dunkerque">Dunkerque</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="event-venue-input">Lieu / Établissement</label>
+              <input type="text" id="event-venue-input" class="form-control" placeholder="ex: Le Phare de Gravelines" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="event-address-input">Adresse complète</label>
+            <input type="text" id="event-address-input" class="form-control" placeholder="ex: 12 Rue du Port, Gravelines" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label for="event-date-input">Date</label>
+              <input type="date" id="event-date-input" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label for="event-time-input">Heure de début</label>
+              <input type="time" id="event-time-input" class="form-control" value="20:00" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="event-vibe-input">Ambiance / Style</label>
+            <input type="text" id="event-vibe-input" class="form-control" placeholder="ex: Chanson Française, Années 80, Pop" required>
+          </div>
+          <div class="form-group">
+            <label for="event-desc-input">Description détaillée</label>
+            <textarea id="event-desc-input" class="form-control" placeholder="Décrivez le déroulement de la soirée, les tarifs, si une réservation est conseillée..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="close-event-footer" onclick="document.getElementById('event-modal').classList.remove('active')">Annuler</button>
+          <button type="submit" class="btn-primary" id="btn-submit-event">Publier la soirée</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>
