@@ -150,12 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   loadEvents();
-  try {
-    initMap();
-  } catch (err) {
-    console.error("Map initialization failed:", err);
-    addBotMessage(`⚠️ <b>Erreur d'initialisation de la carte :</b> ${err.message}`);
-  }
   setupUIEventListeners();
   renderEvents();
   updateGeminiStatus();
@@ -251,6 +245,7 @@ function initMap() {
 
 // Update Map Markers based on filtered events
 function updateMapMarkers() {
+  if (!map || !markersGroup) return;
   markersGroup.clearLayers();
   
   const filtered = getFilteredEvents();
@@ -395,21 +390,22 @@ function openMarkerPopup(eventId) {
 // Focus on an event on map and scroll to its card
 window.focusEventOnMap = function(eventId, lat, lng) {
   try {
-    if (!map) {
-      throw new Error("La carte n'est pas initialisée.");
+    const mapModal = document.getElementById("map-modal");
+    const modalWasHidden = !mapModal.classList.contains("active");
+    
+    if (modalWasHidden) {
+      mapModal.classList.add("active");
     }
     
-    const dashboard = document.querySelector(".dashboard-panel");
-    const mapWasHidden = !dashboard.classList.contains("map-active");
-    
-    if (mapWasHidden) {
-      dashboard.classList.add("map-active");
-      map.invalidateSize();
+    // Initialize map on first open when container is visible
+    const isFirstOpen = !map;
+    if (isFirstOpen) {
+      initMap();
     }
     
     const targetLatLng = L.latLng(lat, lng);
     
-    // Brief timeout to let grid display transition/compute before animating Leaflet
+    // Wait a brief moment to let modal transition kick in
     setTimeout(() => {
       map.invalidateSize();
       
@@ -419,7 +415,7 @@ window.focusEventOnMap = function(eventId, lat, lng) {
       // Check if map is already centered on target coordinates and zoom is 14 (within 20 meters)
       const isAlreadyCentered = currentCenter.distanceTo(targetLatLng) < 20 && currentZoom === 14;
       
-      if (isAlreadyCentered) {
+      if (isAlreadyCentered && !isFirstOpen) {
         // If already centered, open popup immediately
         openMarkerPopup(eventId);
       } else {
@@ -432,7 +428,7 @@ window.focusEventOnMap = function(eventId, lat, lng) {
           duration: 1.2
         });
       }
-    }, mapWasHidden ? 150 : 50);
+    }, isFirstOpen ? 250 : 50);
 
     // Highlight card
     const cards = document.querySelectorAll(".event-card");
