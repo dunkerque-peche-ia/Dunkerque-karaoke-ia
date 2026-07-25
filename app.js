@@ -360,6 +360,17 @@ function renderEvents() {
   });
 }
 
+// Helper to open a popup by event ID
+function openMarkerPopup(eventId) {
+  if (markersGroup) {
+    markersGroup.eachLayer(layer => {
+      if (layer.eventId === eventId) {
+        layer.openPopup();
+      }
+    });
+  }
+}
+
 // Focus on an event on map and scroll to its card
 window.focusEventOnMap = function(eventId, lat, lng) {
   try {
@@ -367,20 +378,40 @@ window.focusEventOnMap = function(eventId, lat, lng) {
       throw new Error("La carte n'est pas initialisée.");
     }
     
-    // Fly to location
-    map.flyTo([lat, lng], 14, {
-      animate: true,
-      duration: 1.5
-    });
+    const dashboard = document.querySelector(".dashboard-panel");
+    const mapWasHidden = !dashboard.classList.contains("map-active");
     
-    // Find marker and open popup
-    if (markersGroup) {
-      markersGroup.eachLayer(layer => {
-        if (layer.eventId === eventId) {
-          layer.openPopup();
-        }
-      });
+    if (mapWasHidden) {
+      dashboard.classList.add("map-active");
+      map.invalidateSize();
     }
+    
+    const targetLatLng = L.latLng(lat, lng);
+    
+    // Brief timeout to let grid display transition/compute before animating Leaflet
+    setTimeout(() => {
+      map.invalidateSize();
+      
+      const currentCenter = map.getCenter();
+      const currentZoom = map.getZoom();
+      
+      // Check if map is already centered on target coordinates and zoom is 14 (within 20 meters)
+      const isAlreadyCentered = currentCenter.distanceTo(targetLatLng) < 20 && currentZoom === 14;
+      
+      if (isAlreadyCentered) {
+        // If already centered, open popup immediately
+        openMarkerPopup(eventId);
+      } else {
+        // If not centered, wait for panning animation to end, then open popup
+        map.once('moveend', () => {
+          openMarkerPopup(eventId);
+        });
+        map.flyTo(targetLatLng, 14, {
+          animate: true,
+          duration: 1.2
+        });
+      }
+    }, mapWasHidden ? 150 : 50);
 
     // Highlight card
     const cards = document.querySelectorAll(".event-card");
@@ -424,6 +455,13 @@ window.resetFilters = function() {
 
 // UI Event Listeners setup
 function setupUIEventListeners() {
+  // Close map button listener
+  const closeMapBtn = document.getElementById("close-map-btn");
+  closeMapBtn.addEventListener("click", () => {
+    const dashboard = document.querySelector(".dashboard-panel");
+    dashboard.classList.remove("map-active");
+  });
+
   // Filter chips
   document.querySelectorAll("[data-filter-city]").forEach(chip => {
     chip.addEventListener("click", () => {
