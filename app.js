@@ -16,16 +16,16 @@ const DEFAULT_EVENTS = [
   },
   {
     id: "e2",
-    title: "Soirée Chants et Pizza à La Maison de la Dune",
+    title: "Soirée Chants et Pizza à La Dune à l'Envers",
     city: "bray-dunes",
-    venue: "La Maison de la Dune",
-    address: "148 Rue des Dunes, Bray-Dunes",
+    venue: "La Dune à l'Envers",
+    address: "Digue de Mer, Bray-Dunes",
     date: "2026-07-24",
     time: "20:00",
-    description: "Une pizza artisanale croustillante, une bière locale, et un micro ouvert pour chanter vos classiques préférés de la chanson française et internationale !",
-    vibe: "Convivial / Brasserie",
-    lat: 51.0772,
-    lng: 2.5215,
+    description: "Une délicieuse pizza croustillante face à la mer, une bière locale bien fraîche et un micro ouvert pour chanter tous vos tubes préférés !",
+    vibe: "Convivial / Digue de Mer",
+    lat: 51.0820,
+    lng: 2.5190,
     type: "restaurant"
   },
   {
@@ -176,6 +176,27 @@ function loadEvents() {
   const stored = localStorage.getItem("karaoke_events");
   if (stored) {
     events = JSON.parse(stored);
+    
+    // Replace old closed La Maison de la Dune (e2) with the active La Dune à l'Envers
+    const oldIndex = events.findIndex(e => e.id === "e2" && e.venue === "La Maison de la Dune");
+    if (oldIndex !== -1) {
+      events[oldIndex] = {
+        id: "e2",
+        title: "Soirée Chants et Pizza à La Dune à l'Envers",
+        city: "bray-dunes",
+        venue: "La Dune à l'Envers",
+        address: "Digue de Mer, Bray-Dunes",
+        date: "2026-07-24",
+        time: "20:00",
+        description: "Une délicieuse pizza croustillante face à la mer, une bière locale bien fraîche et un micro ouvert pour chanter tous vos tubes préférés !",
+        vibe: "Convivial / Digue de Mer",
+        lat: 51.0820,
+        lng: 2.5190,
+        type: "restaurant"
+      };
+      localStorage.setItem("karaoke_events", JSON.stringify(events));
+    }
+    
     // Dynamic merge: add any default event that is not present in the localStorage cache
     let changed = false;
     DEFAULT_EVENTS.forEach(defEv => {
@@ -455,11 +476,11 @@ window.resetFilters = function() {
 
 // UI Event Listeners setup
 function setupUIEventListeners() {
-  // Close map button listener
-  const closeMapBtn = document.getElementById("close-map-btn");
-  closeMapBtn.addEventListener("click", () => {
-    const dashboard = document.querySelector(".dashboard-panel");
-    dashboard.classList.remove("map-active");
+  // Close map modal listener
+  const mapModal = document.getElementById("map-modal");
+  const closeMapModal = document.getElementById("close-map-modal");
+  closeMapModal.addEventListener("click", () => {
+    mapModal.classList.remove("active");
   });
 
   // Filter chips
@@ -593,6 +614,7 @@ function setupUIEventListeners() {
   window.addEventListener("click", (e) => {
     if (e.target === settingsModal) settingsModal.classList.remove("active");
     if (e.target === eventModal) eventModal.classList.remove("active");
+    if (e.target === mapModal) mapModal.classList.remove("active");
   });
 }
 

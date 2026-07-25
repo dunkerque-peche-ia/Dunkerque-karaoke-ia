@@ -299,18 +299,6 @@ header {
 
 /* Dashboard Panel (Right Column) */
 .dashboard-panel {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  height: 100%;
-  overflow: hidden;
-}
-
-.dashboard-panel.map-active {
-  grid-template-columns: 1.15fr 0.85fr;
-}
-
-.events-list-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -319,23 +307,27 @@ header {
   height: 100%;
 }
 
-.map-side-panel {
-  height: 100%;
-  display: none;
-}
-
-.dashboard-panel.map-active .map-side-panel {
-  display: block;
-}
-
-/* Map Widget */
-.map-container {
-  height: 100%;
-  border-radius: 16px;
+/* Map Modal specific styling for square popup in center */
+#map-modal .modal-content {
+  width: min(90vw, 550px);
+  height: min(90vw, 550px);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  border: 1px solid var(--border-color);
+}
+
+#map-modal .modal-body {
+  flex: 1;
+  padding: 0;
   position: relative;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  height: 100%;
+}
+
+#map-modal #map {
+  width: 100%;
+  height: 100%;
+  border-radius: 0 0 20px 20px;
 }
 
 #map {
@@ -759,24 +751,9 @@ textarea.form-control {
   }
 
   .dashboard-panel {
-    grid-template-columns: 1fr;
     height: auto;
     overflow: visible;
     gap: 1.5rem;
-  }
-
-  .events-list-container {
-    height: auto;
-    overflow: visible;
-  }
-
-  .map-side-panel {
-    height: 350px;
-    grid-row: 1; /* Puts the map above the filters and lists on mobile */
-  }
-
-  .map-container {
-    height: 100%;
   }
 }
 

@@ -93,52 +93,37 @@
 
     <!-- Dashboard/Events Column -->
     <section class="dashboard-panel" aria-label="Tableau de bord des soirées">
-      
-      <!-- Left side: List and Filters -->
-      <div class="events-list-container">
-        <!-- Interactive Filters -->
-        <div class="glass-panel filters-container">
-          <div>
-            <div class="filter-title">Ville</div>
-            <div class="filter-row">
-              <button class="filter-chip active" data-filter-city="all">Toutes les villes</button>
-              <button class="filter-chip" data-filter-city="bray-dunes">Bray-Dunes</button>
-              <button class="filter-chip" data-filter-city="gravelines">Gravelines</button>
-              <button class="filter-chip" data-filter-city="dunkerque">Dunkerque & Alentours</button>
-            </div>
-          </div>
-          <div>
-            <div class="filter-title">Date (Aujourd'hui: Ven 24 Juil 2026)</div>
-            <div class="filter-row">
-              <button class="filter-chip active" data-filter-date="all">Toutes les dates</button>
-              <button class="filter-chip" data-filter-date="today">Ce soir</button>
-              <button class="filter-chip" data-filter-date="weekend">Ce week-end</button>
-              <button class="filter-chip" data-filter-date="summer">Été 2026</button>
-            </div>
+      <!-- Interactive Filters -->
+      <div class="glass-panel filters-container">
+        <div>
+          <div class="filter-title">Ville</div>
+          <div class="filter-row">
+            <button class="filter-chip active" data-filter-city="all">Toutes les villes</button>
+            <button class="filter-chip" data-filter-city="bray-dunes">Bray-Dunes</button>
+            <button class="filter-chip" data-filter-city="gravelines">Gravelines</button>
+            <button class="filter-chip" data-filter-city="dunkerque">Dunkerque & Alentours</button>
           </div>
         </div>
-
-        <!-- Events Listing -->
-        <div class="events-section-header">
-          <h2>Soirées Karaoké à l'affiche</h2>
-          <span class="events-count" id="events-count">0 soirée</span>
-        </div>
-
-        <div class="events-grid" id="events-grid">
-          <!-- Event cards will be dynamically rendered here -->
+        <div>
+          <div class="filter-title">Date (Aujourd'hui: Ven 24 Juil 2026)</div>
+          <div class="filter-row">
+            <button class="filter-chip active" data-filter-date="all">Toutes les dates</button>
+            <button class="filter-chip" data-filter-date="today">Ce soir</button>
+            <button class="filter-chip" data-filter-date="weekend">Ce week-end</button>
+            <button class="filter-chip" data-filter-date="summer">Été 2026</button>
+          </div>
         </div>
       </div>
 
-      <!-- Right side: Sticky Map -->
-      <div class="map-side-panel">
-        <div class="map-container">
-          <button id="close-map-btn" class="btn-icon" style="position: absolute; top: 15px; right: 15px; z-index: 1000; background: var(--bg-panel); border: 1px solid var(--border-color); cursor: pointer;" title="Fermer la carte">
-            <i class="fas fa-times"></i>
-          </button>
-          <div id="map"></div>
-        </div>
+      <!-- Events Listing -->
+      <div class="events-section-header">
+        <h2>Soirées Karaoké à l'affiche</h2>
+        <span class="events-count" id="events-count">0 soirée</span>
       </div>
-      
+
+      <div class="events-grid" id="events-grid">
+        <!-- Event cards will be dynamically rendered here -->
+      </div>
     </section>
 
   </main>
@@ -224,6 +209,19 @@
           <button type="submit" class="btn-primary" id="btn-submit-event">Publier la soirée</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Map Modal (Square Popup in Center) -->
+  <div class="modal" id="map-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-map-marked-alt" style="color: var(--neon-cyan);"></i> Carte de la soirée</h3>
+        <button class="btn-close" id="close-map-modal" aria-label="Fermer"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div id="map"></div>
+      </div>
     </div>
   </div>
 
