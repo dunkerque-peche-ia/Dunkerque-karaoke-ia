@@ -1,136 +1,165 @@
-// Database initialization and state management
-const DEFAULT_EVENTS = [
-  {
-    id: "e1",
-    title: "Le Car Podium des Flandres - Karaoké de l'Esplanade",
-    city: "bray-dunes",
-    venue: "Place de l'Esplanade",
-    address: "Digue de Mer, Bray-Dunes",
-    date: "2026-07-28",
-    time: "18:00",
-    description: "L'incontournable tournée des plages s'arrête à Bray-Dunes ! Venez chanter en plein air sur la digue face à la mer. Ambiance familiale, sono pro et écran géant.",
-    vibe: "Plein Air / Populaire",
-    lat: 51.0825,
-    lng: 2.5188,
-    type: "outdoor"
-  },
-  {
-    id: "e2",
-    title: "Soirée Chants et Pizza à La Dune à l'Envers",
-    city: "bray-dunes",
-    venue: "La Dune à l'Envers",
-    address: "Digue de Mer, Bray-Dunes",
-    date: "2026-07-24",
-    time: "20:00",
-    description: "Une délicieuse pizza croustillante face à la mer, une bière locale bien fraîche et un micro ouvert pour chanter tous vos tubes préférés !",
-    vibe: "Convivial / Digue de Mer",
-    lat: 51.0820,
-    lng: 2.5190,
-    type: "restaurant"
-  },
-  {
-    id: "e3",
-    title: "Soirée Moules-Frites & Karaoké",
-    city: "gravelines",
-    venue: "La Taverne du Jean-Bart",
-    address: "Espace Tourville, Gravelines",
-    date: "2026-07-25",
-    time: "19:30",
-    description: "Chaque week-end d'été, joignez-vous à l'équipage du Jean-Bart pour un repas festif animé par notre DJ Karaoké. Ambiance corsaire garantie !",
-    vibe: "Taverne / Chaleureux",
-    lat: 50.9856,
-    lng: 2.1254,
-    type: "restaurant"
-  },
-  {
-    id: "e4",
-    title: "Summer Pop Live & Karaoké",
-    city: "gravelines",
-    venue: "Le Palm Beach",
-    address: "Boulevard de la Plage, Gravelines",
-    date: "2026-07-31",
-    time: "21:00",
-    description: "Grand karaoké estival au bord de l'eau. Ambiance cocktail, pop, rock et variété française. Micro sans fil de qualité pro.",
-    vibe: "Plage / Festif",
-    lat: 51.0112,
-    lng: 2.1150,
-    type: "bar"
-  },
-  {
-    id: "e5",
-    title: "Session Karaoké Box 100% Privée",
-    city: "dunkerque",
-    venue: "Alkasar Bar Karaoke",
-    address: "12 Rue de la Cunette, Dunkerque",
-    date: "2026-07-26",
-    time: "18:00",
-    description: "L'Alkasar est le temple du karaoké à Dunkerque. Louez une box privative pour chanter en toute intimité entre amis ou rejoignez le bar principal.",
-    vibe: "100% Karaoké / Privé",
-    lat: 51.0375,
-    lng: 2.3785,
-    type: "bar"
-  },
-  {
-    id: "e6",
-    title: "Karaoké du Port & Burgers",
-    city: "dunkerque",
-    venue: "A l'Abordage",
-    address: "Quai de la Citadelle, Dunkerque",
-    date: "2026-07-24",
-    time: "21:30",
-    description: "Quoi de mieux qu'un bon burger au bord des quais avant de donner de la voix sur les plus grands hits des années 80 ? Rejoignez-nous ce vendredi !",
-    vibe: "Port / Années 80",
-    lat: 51.0335,
-    lng: 2.3712,
-    type: "restaurant"
-  },
-  {
-    id: "e7",
-    title: "Lundi Acoustique & Micro Ouvert",
-    city: "gravelines",
-    venue: "Café de la Marine",
-    address: "Rue du Port, Gravelines",
-    date: "2026-07-27",
-    time: "20:30",
-    description: "Démarrez la semaine en douceur avec notre soirée micro ouvert et acoustique. Chantez accompagné d'une guitare ou d'un piano !",
-    vibe: "Acoustique / Chill",
-    lat: 50.9902,
-    lng: 2.1215,
-    type: "bar"
-  },
-  {
-    id: "e8",
-    title: "Karaoké Kids & Familles de l'Albeck",
-    city: "bray-dunes",
-    venue: "Maison de Quartier de l'Albeck",
-    address: "Rue Albert 1er, Bray-Dunes",
-    date: "2026-07-29",
-    time: "15:00",
-    description: "Session spéciale de croque-karaoké l'après-midi pour les enfants et les parents. Crêpes, boissons et chansons Disney et Pop !",
-    vibe: "Famille / Convivial",
-    lat: 51.0725,
-    lng: 2.5160,
-    type: "outdoor"
-  },
-  {
-    id: "e9",
-    title: "Warmup Karaoké Jeudi Étudiant",
-    city: "dunkerque",
-    venue: "Le Ride",
-    address: "Digue de Mer, Dunkerque",
-    date: "2026-07-30",
-    time: "21:00",
-    description: "Le rendez-vous des étudiants et des jeunes chanteurs avant le week-end. Tarifs préférentiels sur les cocktails et micro ouvert non-stop.",
-    vibe: "Jeune / Énergique",
-    lat: 51.0485,
-    lng: 2.3995,
-    type: "bar"
-  }
-];
+// Dynamic Date Engine & Date Helpers
+function getTodayDate() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
 
-// Current Date representation: Friday, July 24, 2026
-const CURRENT_DATE_STR = "2026-07-24";
-const CURRENT_DATE = new Date(CURRENT_DATE_STR);
+function formatDateToISO(dateObj) {
+  const y = dateObj.getFullYear();
+  const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const d = String(dateObj.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function getTodayDateStr() {
+  return formatDateToISO(getTodayDate());
+}
+
+// Calculate the next upcoming occurrence of a weekday (0=Sun, 1=Mon, ..., 5=Fri, 6=Sat)
+// If today IS that day, offset = 0 (today)
+function getNextWeekdayDateStr(targetDayOfWeek, weekOffset = 0) {
+  const today = getTodayDate();
+  const currentDayOfWeek = today.getDay();
+  let daysUntil = (targetDayOfWeek - currentDayOfWeek + 7) % 7;
+  daysUntil += weekOffset * 7;
+  
+  const targetDate = new Date(today);
+  targetDate.setDate(today.getDate() + daysUntil);
+  return formatDateToISO(targetDate);
+}
+
+// Generator for default recurring karaoke events anchored dynamically to the current week
+function getFreshDefaultEvents() {
+  return [
+    {
+      id: "e1",
+      title: "Le Car Podium des Flandres - Karaoké de l'Esplanade",
+      city: "bray-dunes",
+      venue: "Place de l'Esplanade",
+      address: "Digue de Mer, Bray-Dunes",
+      date: getNextWeekdayDateStr(2), // Mardi
+      time: "18:00",
+      description: "L'incontournable tournée des plages s'arrête à Bray-Dunes ! Venez chanter en plein air sur la digue face à la mer. Ambiance familiale, sono pro et écran géant.",
+      vibe: "Plein Air / Populaire",
+      lat: 51.0825,
+      lng: 2.5188,
+      type: "outdoor"
+    },
+    {
+      id: "e2",
+      title: "Soirée Chants et Pizza à La Dune à l'Envers",
+      city: "bray-dunes",
+      venue: "La Dune à l'Envers",
+      address: "Digue de Mer, Bray-Dunes",
+      date: getNextWeekdayDateStr(5), // Vendredi
+      time: "20:00",
+      description: "Une délicieuse pizza croustillante face à la mer, une bière locale bien fraîche et un micro ouvert pour chanter tous vos tubes préférés !",
+      vibe: "Convivial / Digue de Mer",
+      lat: 51.0820,
+      lng: 2.5190,
+      type: "restaurant"
+    },
+    {
+      id: "e3",
+      title: "Soirée Moules-Frites & Karaoké",
+      city: "gravelines",
+      venue: "La Taverne du Jean-Bart",
+      address: "Espace Tourville, Gravelines",
+      date: getNextWeekdayDateStr(6), // Samedi
+      time: "19:30",
+      description: "Chaque week-end, joignez-vous à l'équipage du Jean-Bart pour un repas festif animé par notre DJ Karaoké. Ambiance corsaire garantie !",
+      vibe: "Taverne / Chaleureux",
+      lat: 50.9856,
+      lng: 2.1254,
+      type: "restaurant"
+    },
+    {
+      id: "e4",
+      title: "Summer Pop Live & Karaoké",
+      city: "gravelines",
+      venue: "Le Palm Beach",
+      address: "Boulevard de la Plage, Gravelines",
+      date: getNextWeekdayDateStr(5, 1), // Vendredi de la semaine prochaine
+      time: "21:00",
+      description: "Grand karaoké au bord de l'eau. Ambiance cocktail, pop, rock et variété française. Micro sans fil de qualité pro.",
+      vibe: "Plage / Festif",
+      lat: 51.0112,
+      lng: 2.1150,
+      type: "bar"
+    },
+    {
+      id: "e5",
+      title: "Session Karaoké Box 100% Privée",
+      city: "dunkerque",
+      venue: "Alkasar Bar Karaoke",
+      address: "12 Rue de la Cunette, Dunkerque",
+      date: getNextWeekdayDateStr(0), // Dimanche
+      time: "18:00",
+      description: "L'Alkasar est le temple du karaoké à Dunkerque. Louez une box privative pour chanter en toute intimité entre amis ou rejoignez le bar principal.",
+      vibe: "100% Karaoké / Privé",
+      lat: 51.0375,
+      lng: 2.3785,
+      type: "bar"
+    },
+    {
+      id: "e6",
+      title: "Karaoké du Port & Burgers",
+      city: "dunkerque",
+      venue: "A l'Abordage",
+      address: "Quai de la Citadelle, Dunkerque",
+      date: getNextWeekdayDateStr(5), // Vendredi
+      time: "21:30",
+      description: "Quoi de mieux qu'un bon burger au bord des quais avant de donner de la voix sur les plus grands hits des années 80 ? Rejoignez-nous cette semaine !",
+      vibe: "Port / Années 80",
+      lat: 51.0335,
+      lng: 2.3712,
+      type: "restaurant"
+    },
+    {
+      id: "e7",
+      title: "Lundi Acoustique & Micro Ouvert",
+      city: "gravelines",
+      venue: "Café de la Marine",
+      address: "Rue du Port, Gravelines",
+      date: getNextWeekdayDateStr(1), // Lundi
+      time: "20:30",
+      description: "Démarrez la semaine en douceur avec notre soirée micro ouvert et acoustique. Chantez accompagné d'une guitare ou d'un piano !",
+      vibe: "Acoustique / Chill",
+      lat: 50.9902,
+      lng: 2.1215,
+      type: "bar"
+    },
+    {
+      id: "e8",
+      title: "Karaoké Kids & Familles de l'Albeck",
+      city: "bray-dunes",
+      venue: "Maison de Quartier de l'Albeck",
+      address: "Rue Albert 1er, Bray-Dunes",
+      date: getNextWeekdayDateStr(3), // Mercredi
+      time: "15:00",
+      description: "Session spéciale de croque-karaoké l'après-midi pour les enfants et les parents. Crêpes, boissons et chansons Disney et Pop !",
+      vibe: "Famille / Convivial",
+      lat: 51.0725,
+      lng: 2.5160,
+      type: "outdoor"
+    },
+    {
+      id: "e9",
+      title: "Warmup Karaoké Jeudi Étudiant",
+      city: "dunkerque",
+      venue: "Le Ride",
+      address: "Digue de Mer, Dunkerque",
+      date: getNextWeekdayDateStr(4), // Jeudi
+      time: "21:00",
+      description: "Le rendez-vous des étudiants et des jeunes chanteurs avant le week-end. Tarifs préférentiels sur les cocktails et micro ouvert non-stop.",
+      vibe: "Jeune / Énergique",
+      lat: 51.0485,
+      lng: 2.3995,
+      type: "bar"
+    }
+  ];
+}
 
 let events = [];
 let map;
@@ -153,6 +182,13 @@ document.addEventListener("DOMContentLoaded", () => {
   setupUIEventListeners();
   renderEvents();
   updateGeminiStatus();
+
+  // Dynamic date header update
+  const dateFilterTitle = document.getElementById("date-filter-title");
+  if (dateFilterTitle) {
+    const todayFormatted = formatFrenchDate(getTodayDateStr());
+    dateFilterTitle.innerHTML = `Date <span style="font-weight: 400; opacity: 0.85; font-size: 0.82rem;">(Aujourd'hui : ${todayFormatted})</span>`;
+  }
   
   // Recalculate map dimensions on browser window resize
   window.addEventListener("resize", () => {
@@ -162,48 +198,48 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   
   // Add initial welcome message
-  addBotMessage("Salut ! 🎤 Je suis ton assistant IA Karaoké. Je peux t'aider à trouver les meilleures soirées pour chanter à Bray-Dunes, Gravelines et Dunkerque.<br><br>Pose-moi des questions comme :<br>• <i>\"Où chanter ce soir ?\"</i><br>• <i>\"Des soirées ce week-end à Gravelines ?\"</i><br>• <i>\"Quels sont les karaokés à Bray-Dunes ?\"</i>");
+  addBotMessage(`Salut ! 🎤 Je suis ton assistant IA Karaoké.<br>Nous sommes le <b>${formatFrenchDate(getTodayDateStr())}</b>. Je peux t'aider à trouver les meilleures soirées pour chanter à Bray-Dunes, Gravelines et Dunkerque.<br><br>Pose-moi des questions comme :<br>• <i>\"Où chanter ce soir ?\"</i><br>• <i>\"Des soirées ce week-end à Gravelines ?\"</i><br>• <i>\"Quels sont les karaokés à Bray-Dunes ?\"</i>`);
 });
 
 // Load Events from LocalStorage or Defaults
 function loadEvents() {
+  const freshDefaults = getFreshDefaultEvents();
   const stored = localStorage.getItem("karaoke_events");
+
   if (stored) {
     events = JSON.parse(stored);
-    
-    // Replace old closed La Maison de la Dune (e2) with the active La Dune à l'Envers
-    const oldIndex = events.findIndex(e => e.id === "e2" && e.venue === "La Maison de la Dune");
-    if (oldIndex !== -1) {
-      events[oldIndex] = {
-        id: "e2",
-        title: "Soirée Chants et Pizza à La Dune à l'Envers",
-        city: "bray-dunes",
-        venue: "La Dune à l'Envers",
-        address: "Digue de Mer, Bray-Dunes",
-        date: "2026-07-24",
-        time: "20:00",
-        description: "Une délicieuse pizza croustillante face à la mer, une bière locale bien fraîche et un micro ouvert pour chanter tous vos tubes préférés !",
-        vibe: "Convivial / Digue de Mer",
-        lat: 51.0820,
-        lng: 2.5190,
-        type: "restaurant"
-      };
-      localStorage.setItem("karaoke_events", JSON.stringify(events));
-    }
-    
-    // Dynamic merge: add any default event that is not present in the localStorage cache
-    let changed = false;
-    DEFAULT_EVENTS.forEach(defEv => {
-      if (!events.some(e => e.id === defEv.id)) {
-        events.push(defEv);
-        changed = true;
+
+    // Refresh outdated default events so calendar is always up to date
+    const todayObj = getTodayDate();
+    let updated = false;
+
+    events.forEach((ev, idx) => {
+      const freshDef = freshDefaults.find(d => d.id === ev.id);
+      if (freshDef) {
+        const evDate = new Date(ev.date + "T00:00:00");
+        // If the event date is in the past, update it to the fresh upcoming date!
+        if (evDate < todayObj) {
+          events[idx].date = freshDef.date;
+          events[idx].title = freshDef.title;
+          events[idx].description = freshDef.description;
+          updated = true;
+        }
       }
     });
-    if (changed) {
+
+    // Merge any missing default event
+    freshDefaults.forEach(defEv => {
+      if (!events.some(e => e.id === defEv.id)) {
+        events.push(defEv);
+        updated = true;
+      }
+    });
+
+    if (updated) {
       localStorage.setItem("karaoke_events", JSON.stringify(events));
     }
   } else {
-    events = [...DEFAULT_EVENTS];
+    events = freshDefaults;
     localStorage.setItem("karaoke_events", JSON.stringify(events));
   }
 }
@@ -292,6 +328,9 @@ function formatFrenchDate(dateStr) {
 
 // Helper to filter events
 function getFilteredEvents() {
+  const todayObj = getTodayDate();
+  const todayStr = getTodayDateStr();
+
   return events.filter(event => {
     // City filter
     if (activeFilters.city !== "all" && event.city !== activeFilters.city) {
@@ -300,24 +339,25 @@ function getFilteredEvents() {
     
     // Date filter
     if (activeFilters.date !== "all") {
-      const eventDate = new Date(event.date);
-      const diffTime = eventDate - CURRENT_DATE;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const eventDate = new Date(event.date + "T00:00:00");
+      const diffTime = eventDate - todayObj;
+      const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
       
       if (activeFilters.date === "today") {
-        if (event.date !== CURRENT_DATE_STR) return false;
+        if (event.date !== todayStr) return false;
       } else if (activeFilters.date === "weekend") {
-        // Weekend is Friday (0 days diff), Saturday (1 day), Sunday (2 days)
-        if (diffDays < 0 || diffDays > 2) return false;
-      } else if (activeFilters.date === "summer") {
-        // Summer 2026 (July and August)
-        const month = eventDate.getMonth(); // 6 = July, 7 = August
-        if (eventDate.getFullYear() !== 2026 || (month !== 6 && month !== 7)) return false;
+        // Match current/upcoming weekend (diffDays between 0 and 7, on Fri/Sat/Sun)
+        if (diffDays < 0 || diffDays > 7) return false;
+        const evDay = eventDate.getDay();
+        if (evDay !== 5 && evDay !== 6 && evDay !== 0) return false;
+      } else if (activeFilters.date === "month") {
+        // Current month and year
+        if (eventDate.getFullYear() !== todayObj.getFullYear() || eventDate.getMonth() !== todayObj.getMonth()) return false;
       }
     }
     
     return true;
-  }).sort((a, b) => new Date(a.date) - new Date(b.date));
+  }).sort((a, b) => new Date(a.date + "T00:00:00") - new Date(b.date + "T00:00:00"));
 }
 
 // Render events in the grid
@@ -725,13 +765,15 @@ function runLocalAI(userQuery) {
   
   let response = "";
   let matches = [];
+  const todayObj = getTodayDate();
+  const todayStr = getTodayDateStr();
   
   // Analyse sémantique locale
   const isBrayDunes = query.includes("bray") || query.includes("dune");
   const isGravelines = query.includes("grave") || query.includes("jean");
   const isDunkerque = query.includes("dunk") || query.includes("alkasar") || query.includes("abordage");
   
-  const isCeSoir = query.includes("soir") || query.includes("aujourd") || query.includes("vendredi");
+  const isCeSoir = query.includes("soir") || query.includes("aujourd");
   const isWeekend = query.includes("week") || query.includes("samedi") || query.includes("dimanche");
   
   // Search matching events
@@ -749,12 +791,15 @@ function runLocalAI(userQuery) {
     }
     
     // Dates mapping
-    const eventDate = new Date(e.date);
-    const diffTime = eventDate - CURRENT_DATE;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const eventDate = new Date(e.date + "T00:00:00");
+    const diffTime = eventDate - todayObj;
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
     
-    if (isCeSoir && e.date === CURRENT_DATE_STR) matchDate = true;
-    if (isWeekend && (diffDays >= 0 && diffDays <= 2)) matchDate = true;
+    if (isCeSoir && e.date === todayStr) matchDate = true;
+    if (isWeekend && (diffDays >= 0 && diffDays <= 7)) {
+      const evDay = eventDate.getDay();
+      if (evDay === 5 || evDay === 6 || evDay === 0) matchDate = true;
+    }
     
     // If no date mentioned, we match any date
     if (!isCeSoir && !isWeekend) {
@@ -807,7 +852,7 @@ async function callGeminiAPI(userQuery, apiKey) {
 
   const systemInstructions = `
 Tu es un assistant IA expert et enthousiaste en événementiel et karaoké dans la région de Dunkerque, Bray-Dunes et Gravelines.
-La date actuelle de référence est : Vendredi 24 Juillet 2026.
+La date actuelle de référence est : ${formatFrenchDate(getTodayDateStr())}.
 Voici la base de données des soirées karaoké actuellement disponibles dans la région (au format JSON) :
 ${JSON.stringify(dbContext, null, 2)}
 
